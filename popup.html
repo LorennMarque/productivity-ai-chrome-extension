@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Guard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00A3FF;
+            --success-color: #00C853;
+            --warning-color: #FF3D00;
+            --background-color: #1A1A1A;
+            --card-background: rgba(255, 255, 255, 0.05);
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 400px;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-color), #00C853);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .shortcuts {
+            display: flex;
+            gap: 10px;
+        }
+
+        .shortcut-btn {
+            background: var(--card-background);
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .shortcut-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .current-analysis {
+            background: var(--card-background);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            min-height: 200px;
+        }
+
+        .current-analysis.warning {
+            border-left: 4px solid var(--warning-color);
+            animation: pulse 2s infinite;
+        }
+
+        .current-analysis:not(.warning) {
+            border-left: 4px solid var(--success-color);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .analysis-content {
+            position: relative;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .loading-animation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        #currentPageTitle {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        #currentPageUrl {
+            color: var(--text-secondary);
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        #currentAnalysis {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .analysis-message {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .analysis-reasoning {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.success {
+            background: var(--success-color);
+        }
+
+        .status-indicator.warning {
+            background: var(--warning-color);
+        }
+
+        /* Settings Styles */
+        .settings-section {
+            background: var(--card-background);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .save-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #0088cc;
+            transform: translateY(-2px);
+        }
+
+        .save-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .api-status {
+            font-size: 14px;
+            padding: 8px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .api-status.success {
+            display: block;
+            background: rgba(0, 200, 83, 0.1);
+            color: var(--success-color);
+        }
+
+        .api-status.error {
+            display: block;
+            background: rgba(255, 61, 0, 0.1);
+            color: var(--warning-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Productivity Guard</h1>
+        <div class="shortcuts">
+            <button class="shortcut-btn" title="Close Current Tab" id="closeTabBtn">✕</button>
+            <button class="shortcut-btn" title="Refresh Analysis" id="refreshBtn">↻</button>
+        </div>
+    </div>
+    
+    <div class="current-analysis">
+        <div class="analysis-content">
+            <div class="loading-animation" id="loadingAnimation"></div>
+            <div id="currentPageTitle"></div>
+            <div id="currentPageUrl"></div>
+            <div id="currentAnalysis"></div>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h2>Settings</h2>
+        <form class="settings-form" id="settingsForm">
+            <div class="form-group">
+                <label for="apiKey">OpenAI API Key</label>
+                <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" />
+            </div>
+            <div id="apiStatus" class="api-status"></div>
+            <button type="submit" class="save-btn" id="saveSettings">Save Settings</button>
+        </form>
+    </div>
+
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
